@@ -242,3 +242,103 @@ export function checkGeminiKeys(
     }),
   }).then(response => response.json());
 }
+
+// 添加 Gemini API 测试函数
+export async function testGeminiModel(apiUrl, apiKey, modelNames, timeoutSeconds, concurrency, progressCallback) {
+  const valid = [];
+  const invalid = [];
+  const inconsistent = [];
+
+  async function testModel(model) {
+    const apiUrlValue = apiUrl.replace(/\/+$/, '');
+    let timeout = timeoutSeconds * 1000;
+    
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const startTime = Date.now();
+
+    let response_text;
+    try {
+      const requestBody = {
+        contents: [{
+          parts: [{
+            text: "写一个10个字的冷笑话"
+          }]
+        }],
+        model: model,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 100,
+        }
+      };
+
+      const response = await fetch(`${apiUrlValue}/v1/models/${model}:generateContent`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      const endTime = Date.now();
+      const responseTime = (endTime - startTime) / 1000;
+
+      if (response.ok) {
+        const data = await response.json();
+        const returnedModel = data.model || model;
+
+        if (returnedModel === model) {
+          const resultData = { model, responseTime };
+          valid.push(resultData);
+          progressCallback({
+            type: 'valid',
+            data: resultData,
+          });
+        } else {
+          const resultData = {
+            model,
+            returnedModel,
+            responseTime,
+          };
+          inconsistent.push(resultData);
+          progressCallback({
+            type: 'inconsistent',
+            data: resultData,
+          });
+        }
+      } else {
+        try {
+          const jsonResponse = await response.json();
+          response_text = jsonResponse.error?.message || '未知错误';
+        } catch (jsonError) {
+          response_text = await response.text();
+        }
+        const resultData = { model, response_text };
+        invalid.push(resultData);
+        progressCallback({
+          type: 'invalid',
+          data: resultData,
+        });
+      }
+    } catch (error) {
+      const resultData = { 
+        model, 
+        response_text: error.message || '请求失败'
+      };
+      invalid.push(resultData);
+      progressCallback({
+        type: 'invalid',
+        data: resultData,
+      });
+    } finally {
+      clearTimeout(id);
+    }
+  }
+
+  const tasks = modelNames.map(model => testModel(model));
+  await Promise.all(tasks.map(p => p.catch(e => e)));
+
+  return { valid, invalid, inconsistent };
+}

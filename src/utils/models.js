@@ -24,12 +24,20 @@ export const cantFunctionModelList = [
   'o1-mini-2024-09-12',
   'o1-preview',
   'o1-preview-2024-09-12',
+  'gemini-pro',
+  'gemini-pro-vision',
+  'gemini-1.5-pro',
+  'gemini-1.5-pro-002',
+  'gemini-1.5-pro-experimental-0827',
+  'gemini-1.5-pro-latest',
+  'gemini-experimental-1121'
 ];
 export const cantTemperatureModelList = [
   'o1-mini',
   'o1-mini-2024-09-12',
   'o1-preview',
   'o1-preview-2024-09-12',
+  'gemini-pro-vision'
 ];
 export const cantOfficialModelList = [
   // 无法使用官方验证列表
@@ -37,6 +45,13 @@ export const cantOfficialModelList = [
   'o1-mini-2024-09-12',
   'o1-preview',
   'o1-preview-2024-09-12',
+  'gemini-pro',
+  'gemini-pro-vision',
+  'gemini-1.5-pro',
+  'gemini-1.5-pro-002',
+  'gemini-1.5-pro-experimental-0827',
+  'gemini-1.5-pro-latest',
+  'gemini-experimental-1121'
 ];
 export const presetPromptsList = [
   {
@@ -82,4 +97,14 @@ export const presetPromptsList = [
     description:
       'gpt-4o：乱回答 \n 比如：好好表现 can be translated into English as perform well or do well.',
   },
+];
+
+export const geminiModelList = [
+  'gemini-pro',
+  'gemini-pro-vision',
+  'gemini-1.5-pro',
+  'gemini-1.5-pro-002',
+  'gemini-1.5-pro-experimental-0827',
+  'gemini-1.5-pro-latest',
+  'gemini-experimental-1121'
 ];

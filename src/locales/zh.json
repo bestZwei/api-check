@@ -230,5 +230,10 @@
   "ENTER_GEMINI_API_KEYS_ONE_PER_LINE": "请输入 Gemini API Keys，每行一个",
   "ENTER_REFRESH_TOKENS": "请输入 Refresh Tokens",
   "ENTER_SESSION_KEYS": "请输入 Session Keys",
-  "ENTER_GEMINI_API_KEYS": "请输入 Gemini API Keys"
+  "ENTER_GEMINI_API_KEYS": "请输入 Gemini API Keys",
+  "API_TYPE": "API 类型",
+  "API_TYPE_OPENAI": "OpenAI API",
+  "API_TYPE_GEMINI": "Gemini API",
+  "GEMINI_API_URL_PLACEHOLDER": "Gemini API地址，如：https://generativelanguage.googleapis.com",
+  "GEMINI_API_KEY_PLACEHOLDER": "API密钥，如：AIzaSyxxxx..."
 }

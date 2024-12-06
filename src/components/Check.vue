@@ -121,6 +121,11 @@
 
             <form @submit.prevent="handleSubmit" id="apiForm">
               <div style="position: relative">
+                <!-- 在 API 信息输入区域添加类型选择 -->
+                <a-select v-model:value="apiType" style="width: 120px; margin-right: 10px;">
+                  <a-select-option value="openai">OpenAI</a-select-option>
+                  <a-select-option value="gemini">Gemini</a-select-option>
+                </a-select>
                 <textarea
                   v-model="apiInfo"
                   id="api_info"
@@ -1087,7 +1092,7 @@ import {
   initializeLanguage,
   initializeTheme,
 } from '../utils/initialization.js';
-import { fetchModelList, fetchQuotaInfo, testModelList } from '../utils/api.js';
+import { fetchModelList, fetchQuotaInfo, testModelList, testGeminiModel } from '../utils/api.js';
 import {
   calculateSummaryData,
   errorHandler,
@@ -1697,23 +1702,37 @@ async function testModels() {
   testModels_spinning.value = true;
 
   try {
-    await testModelList(
-      apiUrlValue,
-      apiKeyValue,
-      modelNames,
-      timeout,
-      concurrency,
-      progress => {
-        updateTableData(progress);
-        completedModels.value += 1;
-        progressPercent.value = Math.round(
-          (completedModels.value / totalModels.value) * 100
-        );
-        if (completedModels.value >= totalModels.value) {
-          testingComplete.value = true;
+    if (apiType.value === 'openai') {
+      await testModelList(
+        apiUrlValue,
+        apiKeyValue,
+        modelNames,
+        timeout,
+        concurrency,
+        progress => {
+          updateTableData(progress);
+          completedModels.value += 1;
+          progressPercent.value = Math.round(
+            (completedModels.value / totalModels.value) * 100
+          );
         }
-      }
-    );
+      );
+    } else if (apiType.value === 'gemini') {
+      await testGeminiModel(
+        apiUrlValue,
+        apiKeyValue,
+        modelNames,
+        timeout,
+        concurrency,
+        progress => {
+          updateTableData(progress);
+          completedModels.value += 1;
+          progressPercent.value = Math.round(
+            (completedModels.value / totalModels.value) * 100
+          );
+        }
+      );
+    }
     testModels_spinning.value = false;
     showSummary(results);
   } catch (error) {
@@ -2930,6 +2949,51 @@ async function handlePaste() {
   } catch (err) {
     console.error('粘贴失败:', err);
     message.error(t('PASTE_FAILED'));
+  }
+}
+
+// 添加 API 类型状态
+const apiType = ref('openai');
+
+// 修改测试函数
+async function handleTest() {
+  // ... 原有代码 ...
+  
+  try {
+    if (apiType.value === 'openai') {
+      await testModelList(
+        apiUrlValue,
+        apiKeyValue,
+        modelNames,
+        timeout,
+        concurrency,
+        progress => {
+          updateTableData(progress);
+          completedModels.value += 1;
+          progressPercent.value = Math.round(
+            (completedModels.value / totalModels.value) * 100
+          );
+        }
+      );
+    } else if (apiType.value === 'gemini') {
+      await testGeminiModel(
+        apiUrlValue,
+        apiKeyValue,
+        modelNames,
+        timeout,
+        concurrency,
+        progress => {
+          updateTableData(progress);
+          completedModels.value += 1;
+          progressPercent.value = Math.round(
+            (completedModels.value / totalModels.value) * 100
+          );
+        }
+      );
+    }
+    // ... 其余代码 ...
+  } catch (error) {
+    // ... 错误处理 ...
   }
 }
 </script>
